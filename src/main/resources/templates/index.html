@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>EasyWeb</title>
+    <% include("./layout/cssPart.html"){} %>
+</head>
+
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+    <!-- 头部 -->
+    <div class="layui-header">
+        <% include("./layout/header.html"){} %>
+    </div>
+
+    <!-- 侧边栏 -->
+    <div class="layui-side">
+        <% include("./layout/side.html"){} %>
+    </div>
+
+    <!-- 主体部分 -->
+    <div class="layui-body">
+        <div class="layui-tab" lay-allowClose="true" lay-filter="admin-pagetabs">
+            <ul class="layui-tab-title">
+            </ul>
+            <div class="layui-tab-content">
+            </div>
+        </div>
+        <div class="layui-icon admin-tabs-control layui-icon-prev" ew-event="leftPage"></div>
+        <div class="layui-icon admin-tabs-control layui-icon-next" ew-event="rightPage"></div>
+        <div class="layui-icon admin-tabs-control layui-icon-down">
+            <ul class="layui-nav admin-tabs-select" lay-filter="admin-pagetabs-nav">
+                <li class="layui-nav-item" lay-unselect>
+                    <a href="javascript:;"></a>
+                    <dl class="layui-nav-child layui-anim-fadein">
+                        <dd ew-event="closeThisTabs" lay-unselect><a href="javascript:;">关闭当前标签页</a></dd>
+                        <dd ew-event="closeOtherTabs" lay-unselect><a href="javascript:;">关闭其它标签页</a></dd>
+                        <dd ew-event="closeAllTabs" lay-unselect><a href="javascript:;">关闭全部标签页</a></dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 底部 -->
+    <div class="layui-footer">Copyright © 2018 EasyWeb All rights reserved. <span class="pull-right">Version 2.0</span>
+    </div>
+
+    <!-- 手机屏幕遮罩层 -->
+    <div class="site-mobile-shade"></div>
+</div>
+
+<% include("./layout/jsPart.html"){} %>
+
+<script>
+    layui.use(['index'], function () {
+        var index = layui.index;
+
+        index.checkPageTabs(true);  // 检查多标签是否开启
+        index.initRouter();  // 导航栏和tab联动
+        index.bindEvent();  // 绑定事件
+
+    });
+</script>
+</body>
+
+</html>
