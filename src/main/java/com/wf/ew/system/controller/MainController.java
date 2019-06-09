@@ -208,7 +208,7 @@ public class MainController extends BaseController implements ErrorController {
 			deptDeptDtoList.add(dto);
 		}
         System.out.println(JSONArray.toJSONString(deptDeptDtoList));
-        
+        System.out.println("111");
         return JSONArray.toJSONString(deptDeptDtoList);
     }
     
