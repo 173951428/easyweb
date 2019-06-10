@@ -195,6 +195,12 @@ public class MainController extends BaseController implements ErrorController {
     	 return "demo.html";
     }
     
+    //找回密码step1
+    @RequestMapping("changePassword/Step1")
+    public String changePasswordStep1() {
+    	return "change_pwd_stepone.html";
+    }
+    
     @ResponseBody
     @RequestMapping("/listDept")
     public String list() {

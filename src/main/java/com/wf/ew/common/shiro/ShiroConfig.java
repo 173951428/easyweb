@@ -38,6 +38,7 @@ public class ShiroConfig {
         filterChainDefinitions.put("/doReg", "anon");//排除发送邮箱的请求
         filterChainDefinitions.put("/demo", "anon");//排除个人测试页面
         filterChainDefinitions.put("/listDept", "anon");//排除测试部门请求
+        filterChainDefinitions.put("/changePassword/**", "anon");//排除更改密码请求
         filterChainDefinitions.put("/assets/**", "anon");
         filterChainDefinitions.put("/module/**", "anon");
         filterChainDefinitions.put("/api/**", "anon");
