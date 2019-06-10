@@ -2,6 +2,7 @@ package com.wf.ew.system.controller;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -168,7 +169,32 @@ public class MainController extends BaseController implements ErrorController {
         return JsonResult.ok("注册成功");
         
     } 
-
+    
+ /**
+  * 忘记密码下一步
+  * @param email
+  * @param vercode
+  * @param request
+  * @return
+  */
+    @ResponseBody
+    @PostMapping("/doForgotNext")
+    public JsonResult doForgotNext(String email,String vercode,HttpServletRequest request,Model model) {
+    	System.out.println("得到的验证码是："+vercode+",,得到的邮箱是:"+email);
+    	String sessionVerCode=(String) request.getSession().getAttribute("forgotCode");
+    	String vcodeTimeArray[] = sessionVerCode.split("#");
+    	if(vcodeTimeArray[0].equals(vercode)) {
+    		 boolean flag=TimeUtil.cmpTime(vcodeTimeArray[1]);
+    		 if(flag==false) {
+    			 return JsonResult.error("邮箱验证码超时");
+    		 }
+    	}else {
+    		return JsonResult.error("邮箱验证不正确");
+    	}
+    	request.getSession().setAttribute("changeEmail", email);
+        return JsonResult.ok();
+        
+    }
     /**
      * 图形验证码，用assets开头可以排除shiro拦截
      */
@@ -183,7 +209,33 @@ public class MainController extends BaseController implements ErrorController {
         }
     }
 
+    /**
+     * 找回密码第二步，更改密码
+     * @return
+     */
+    @RequestMapping("/change")
+    public String change(HttpServletRequest request,Model model) {
+    	
+    	 String changeEmail=(String)request.getSession().getAttribute("changeEmail");
+    	 if(StringUtil.isBlank(changeEmail)) {
+    		 return "forgot.html";
+    	 }
+    	  model.addAttribute("changeEmail", changeEmail);
+    	 return "change.html";
+    }
     
+    @ResponseBody
+    @PostMapping("/changePassword")
+    public JsonResult changePassword(String email) {
+    	System.out.println("得到需要修改的email为:"+email);
+		return null;
+        
+    }
+    
+    /**
+     * 
+     * @return
+     */
     @RequestMapping("/reg")
     public String reg() {
     	 return "reg.html";
@@ -196,9 +248,9 @@ public class MainController extends BaseController implements ErrorController {
     }
     
     //找回密码step1
-    @RequestMapping("changePassword/Step1")
-    public String changePasswordStep1() {
-    	return "change_pwd_stepone.html";
+    @RequestMapping("forgot")
+    public String forgot() {
+    	return "forgot.html";
     }
     
     @ResponseBody
@@ -214,7 +266,6 @@ public class MainController extends BaseController implements ErrorController {
 			deptDeptDtoList.add(dto);
 		}
         System.out.println(JSONArray.toJSONString(deptDeptDtoList));
-        System.out.println("111");
         return JSONArray.toJSONString(deptDeptDtoList);
     }
     
@@ -271,6 +322,72 @@ public class MainController extends BaseController implements ErrorController {
 	        transport.close();
 	        return JsonResult.ok(0,"邮件发送成功");
 	}
+    
+    /**
+     * 重置密码发送邮件
+     * @param request
+     * @return
+     * @throws Exception
+     * @throws GeneralSecurityException
+     * @throws MessagingException
+     */
+    @ResponseBody
+    @PostMapping("/getForgotEmailCode")
+    public JsonResult getForgotEmailCode(HttpServletRequest request) throws Exception,GeneralSecurityException, MessagingException {
+    	String  receiveMailAccount=request.getParameter("email"); //要发送的邮箱
+    	if(userService.selectByEmail(receiveMailAccount)==0) {
+    		 return JsonResult.ok(1,"该邮箱尚未注册");
+    	}else {
+    		Properties props = new Properties();
+	        // 开启debug调试
+	        props.setProperty("mail.debug", "true");
+	        // 发送服务器需要身份验证
+	        props.setProperty("mail.smtp.auth", "true");
+	        // 设置邮件服务器主机名
+	        props.setProperty("mail.host", "smtp.qq.com");
+	        // 发送邮件协议名称
+	        props.setProperty("mail.transport.protocol", "smtp");
+	     
+	        MailSSLSocketFactory sf = new MailSSLSocketFactory();
+	        sf.setTrustAllHosts(true);
+	        props.put("mail.smtp.ssl.enable", "true");
+	        props.put("mail.smtp.ssl.socketFactory", sf);
+	        Session session = Session.getInstance(props);
+	        Message msg = new MimeMessage(session);
+	        msg.setSubject(" the springBoot project verification code"); //邮件标题
+	        StringBuilder builder = new StringBuilder();
+	        String checkCode= String.valueOf((new Random().nextInt(899999) + 100000));
+	        HttpSession sysSession= request.getSession();
+	        String nowTime = TimeUtil.getTime();
+	        sysSession.setAttribute("forgotCode",checkCode+"#"+nowTime);
+	        System.out.println("checkCode的值为："+sysSession.getAttribute("forgotCode"));
+	        builder.append("your verification code:");
+	        builder.append(" ");
+	        builder.append(checkCode);
+	        builder.append("\n This verification code is used for change the password,Please don't tell anyone !");
+	        msg.setText(builder.toString());
+	        msg.setFrom(new InternetAddress("scootzhao@qq.com"));  //发送人的邮箱
+	        Transport transport = session.getTransport();
+	        /**
+	         * param1  发件人的邮箱协议
+	         * 
+	         * param2 发件人的邮箱地址
+	         * 
+	         * param3  POP3/SMTP服务,这时QQ邮件会让我们设置客户端授权码
+	         */
+	        transport.connect("smtp.qq.com", "scootzhao@qq.com", "cqrepmaasqvrbffc"); 
+	        try {
+				transport.sendMessage(msg, new Address[] {new InternetAddress(receiveMailAccount)});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+	        transport.close();
+	        return JsonResult.ok(0,"邮件发送成功");
+    	}
+    	
+    	
+	
+    }
     
     /**
      * iframe页

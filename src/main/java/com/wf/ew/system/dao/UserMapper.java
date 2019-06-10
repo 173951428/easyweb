@@ -6,4 +6,5 @@ import com.wf.ew.system.model.User;
 public interface UserMapper extends BaseMapper<User> {
 
     User getByUsername(String username);
+    Integer selectByEmail(String email);
 }

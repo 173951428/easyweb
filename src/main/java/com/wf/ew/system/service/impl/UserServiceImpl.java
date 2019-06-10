@@ -178,4 +178,10 @@ public class UserServiceImpl implements UserService {
         return listmap;
 
 	}
+
+	@Override
+	public Integer selectByEmail(String email) {
+		// TODO Auto-generated method stub
+		return userMapper.selectByEmail(email);
+	}
 }

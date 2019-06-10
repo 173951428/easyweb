@@ -5,4 +5,8 @@
     <select id="getByUsername" resultType="com.wf.ew.system.model.User">
         select * from sys_user where username=#{username}
     </select>
+    
+     <select id="selectByEmail" resultType="java.lang.Integer">
+        select count(*) from sys_user where email=#{email}
+    </select>
 </mapper>

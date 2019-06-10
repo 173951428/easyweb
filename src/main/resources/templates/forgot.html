@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta charset="utf-8"/>
     <title>找回密码</title>
-    <link rel="stylesheet" href="../assets/libs/layui/css/layui.css"/>
-    <link rel="stylesheet" href="../assets/css/login.css" media="all">
+    <link rel="stylesheet" href="assets/libs/layui/css/layui.css"/>
+    <link rel="stylesheet" href="assets/css/login.css" media="all">
     <script>
         if (window != top)
             top.location.replace(location.href);
@@ -18,13 +18,13 @@
 <div class="login-wrapper">
 
     <div class="login-header">
-      <img src="../assets/images/logo.png"> SpringBootDemo
+      <img src="assets/images/logo.png"> SpringBootDemo
     </div>
 
     <div class=" login-body">
         <div class="layui-card">
             <div class="layui-card-header">
-                <i class="layui-icon layui-icon-engine"></i>&nbsp;&nbsp;找回密码
+                <i class="layui-icon layui-icon-engine"></i>&nbsp;&nbsp;重置密码
             </div>
             <form class="layui-card-body layui-form layui-form-pane">
               <div class="layui-form-item">
@@ -57,7 +57,7 @@
                     <a href="${ctxPath }/login" class="layui-link pull-right">已有账号登录</a>
                 </div>
                 <div class="layui-form-item">
-                    <button lay-filter="login-submit" class="layui-btn layui-btn-fluid" lay-submit>注册</button>
+                    <button lay-filter="forgot-submit" class="layui-btn layui-btn-fluid" lay-submit>下一步</button>
                 </div>
               
             </form>
@@ -74,7 +74,7 @@
     </div>
 </div>
 
-<script type="text/javascript" src="../assets/libs/layui/layui.js"></script>
+<script type="text/javascript" src="assets/libs/layui/layui.js"></script>
 <script>
 
 
@@ -88,29 +88,8 @@
   		
         var clock = '';
         var nums = 120;
-        // 表单提交
-         form.on('submit(login-submit)', function (obj) {
-            layer.load(2);
-            $.post('doReg', obj.field, function (data) {
-            	debugger;
-                if (200 == data.code) {
-                	 //layer.msg(data.msg, {icon: 1});
-                	alert("注册成功"); 
-                	location.replace('./');
-                } else {
-                    layer.closeAll('loading');
-                    layer.msg(data.msg, {icon: 5});
-                    $('.login-captcha').trigger('click');
-                }
-            }, 'JSON');
-            return false;
-        });  
+ 
 
-        // 图形验证码
-        $('.login-captcha').click(function () {
-            this.src = this.src + '?t=' + (new Date).getTime();
-        });
-        
         // 获取邮箱验证码 
        $("#emailCode").click(function(){
     	  var email=$("#email").val();
@@ -127,7 +106,7 @@
     	   
     	   var param = {email:email};
     	   $.ajax({
-   		    url:"getEmailCode",    //请求的url地址
+   		    url:"getForgotEmailCode",    //请求的url地址
    		 	data : param,
    		    dataType:"json",   //返回格式为json
    		    async:true,//请求是否异步，默认为异步，这也是ajax重要特性
@@ -136,12 +115,17 @@
    		        //请求前的处理
    		    },
    		    success:function(data){
+   		    	debugger;
    		        //请求成功时处理
    		    	if(data.code==0){
    		    		$("#emailCode").attr("disabled", true); //将按钮置为不可点击
    		    		$("#emailCode").text(nums+'秒后重获'); 
    		    		clock = setInterval(countDown, 1000); //一秒执行一次
-   		    	}else {
+   		    	}else if(data.code==1){
+   		    		layer.msg(data.msg, {icon: 0});
+   		    		return false;
+   		    	}
+   		    	else {
    		    		layer.msg("邮件发送失败", {icon: 0});
    		    		return false;
    		    	}
@@ -169,6 +153,21 @@
        }  
      
       
+       
+       form.on('submit(forgot-submit)', function (obj) {
+       	debugger;
+           layer.load(2);
+           $.post('doForgotNext', obj.field, function (data) {
+           	debugger;
+               if (200 == data.code) {
+               	location.replace('/change');
+               } else {
+                   layer.closeAll('loading');
+                   layer.msg(data.msg, {icon: 5});
+               }
+           }, 'JSON');
+           return false;
+       });  
     });
    
     

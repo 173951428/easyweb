@@ -28,5 +28,7 @@ public interface UserService {
     List<User> selectByParam(String searchKey, String searchValue);
     
     public List<Map<String, Object>> createExcelRecord(List<User> users); 
+    
+    public Integer selectByEmail(String email);
 
 }
