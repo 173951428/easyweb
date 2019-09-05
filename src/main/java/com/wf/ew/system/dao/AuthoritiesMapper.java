@@ -13,4 +13,6 @@ public interface AuthoritiesMapper extends BaseMapper<Authorities> {
     List<Authorities> listByRoleIds(@Param("roleIds") List<Integer> roleIds);
 
     List<Authorities> listByRoleId(Integer roleId);
+
+    // idea 代码测试
 }
